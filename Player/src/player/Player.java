@@ -9,15 +9,11 @@ package player;
 // Imports
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -37,21 +33,20 @@ public class Player extends Application {
     Scene scene = new Scene(main, WIDTH, HEIGHT);
 
     // Rectangles for the body
-    Rectangle rgHead = new Rectangle(WIDTH / 30, WIDTH / 30);
-    Rectangle rgLeftArm = new Rectangle(WIDTH / 25, HEIGHT / 50);
-    Rectangle rgTorso = new Rectangle(WIDTH / 20, WIDTH / 20);
-    Rectangle rgRightArm = new Rectangle(WIDTH / 25, HEIGHT / 50);
-    Rectangle rgLeftLeg = new Rectangle(HEIGHT / 50, WIDTH / 25);
-    Rectangle rgRightLeg = new Rectangle(HEIGHT / 50, WIDTH / 25);
+    Rectangle rgHead = new Rectangle(HEIGHT / 48, HEIGHT / 48);
+    Rectangle rgTorso = new Rectangle(HEIGHT / 30, HEIGHT / 30);
+    Rectangle rgLeftArm = new Rectangle(HEIGHT / 90, HEIGHT / 40);
+    Rectangle rgRightArm = new Rectangle(HEIGHT / 90, HEIGHT / 40);
+    Rectangle rgLeftLeg = new Rectangle(HEIGHT / 90, HEIGHT / 36);
+    Rectangle rgRightLeg = new Rectangle(HEIGHT / 90, HEIGHT / 36);
 
-    // VBox body
-    VBox vbBody = new VBox(0);
+    // Player Movement
+    TranslateTransition translateTransition = new TranslateTransition();
+    private final int playerSpeed = 3;
+    private final int animationMultiple = 1;
 
-    // Hbox for mid body
-    HBox hbBodyMid = new HBox(0);
-
-    // Hbox for lower body
-    HBox hbBodyLower = new HBox(WIDTH / 100);
+    // Group for body
+    Group gBody = new Group();
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -61,111 +56,133 @@ public class Player extends Application {
         stage.setResizable(false);
         stage.show();
 
-        // Draw()
-        drawHead();
-        drawMidBody();
-        drawLowerBody();
+        // Draw body
+        drawBody();
 
         // Add the body to the pane
-        main.setCenter(vbBody);
+        main.setCenter(gBody);
 
         // Handle walking
         scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.A) {
-                handleWalk("left");
-            } else if (e.getCode() == KeyCode.D) {
-                handleWalk("right");
+            if (null != e.getCode()) {
+                switch (e.getCode()) {
+                    case A:
+                        // Move left
+                        handleWalk("left");
+                        break;
+                    case D:
+                        // Move Right
+                        handleWalk("right");
+                        break;
+                    case W:
+                        // Jump
+                        handleJump();
+                        break;
+                    default:
+                        break;
+                }
             }
         });
+
     }
 
-    public void drawHead() {
+    public void drawBody() {
         // Rectangle for head
         rgHead.setFill(Color.web("d88c68"));
+        rgHead.setX(rgLeftArm.getWidth() + rgTorso.getWidth() / 2 - rgHead.getWidth() / 2);
 
-        // Add the head to the body
-        vbBody.getChildren().add(rgHead);
-
-        // Center the body
-        vbBody.setAlignment(Pos.CENTER);
-    }
-
-    public void drawMidBody() {
         // Rectangle for left arm
-        rgLeftArm.setArcHeight(10);
-        rgLeftArm.setArcWidth(10);
+        rgLeftArm.setArcHeight(5);
+        rgLeftArm.setArcWidth(5);
         rgLeftArm.setFill(Color.web("d88c68"));
+        rgLeftArm.setY(rgHead.getHeight());
 
         // Rectangle for torso
         rgTorso.setFill(Color.web("d88c68"));
+        rgTorso.setX(rgLeftArm.getWidth());
+        rgTorso.setY(rgHead.getHeight());
 
         // Rectangle for right arm
-        rgRightArm.setArcHeight(10);
-        rgRightArm.setArcWidth(10);
+        rgRightArm.setArcHeight(5);
+        rgRightArm.setArcWidth(5);
         rgRightArm.setFill(Color.web("d88c68"));
+        rgRightArm.setX(rgLeftArm.getWidth() + rgTorso.getWidth());
+        rgRightArm.setY(rgHead.getHeight());
 
-        // Add arms and torso to mid body
-        hbBodyMid.getChildren().addAll(rgLeftArm, rgTorso, rgRightArm);
-
-        // Center mid body
-        hbBodyMid.setAlignment(Pos.CENTER);
-
-        // Add mid body to body
-        vbBody.getChildren().add(hbBodyMid);
-    }
-
-    public void drawLowerBody() {
         // Rectangle for left leg
-        rgLeftLeg.setArcHeight(10);
-        rgLeftLeg.setArcWidth(10);
+        rgLeftLeg.setArcHeight(5);
+        rgLeftLeg.setArcWidth(5);
         rgLeftLeg.setFill(Color.web("d88c68"));
+        rgLeftLeg.setX(rgTorso.getX() + rgLeftLeg.getWidth() * 2
+                - rgLeftLeg.getWidth() / 3);
+        rgLeftLeg.setY(rgHead.getHeight() + rgTorso.getWidth());
 
         // Rectangle for right leg
-        rgRightLeg.setArcHeight(10);
-        rgRightLeg.setArcWidth(10);
+        rgRightLeg.setArcHeight(5);
+        rgRightLeg.setArcWidth(5);
         rgRightLeg.setFill(Color.web("d88c68"));
+        rgRightLeg.setX(rgTorso.getX() + rgTorso.getWidth()
+                - rgRightLeg.getWidth() * 3 + rgRightLeg.getWidth() / 3);
+        rgRightLeg.setY(rgHead.getHeight() + rgTorso.getWidth());
 
-        // Add arms and torso to mid body
-        hbBodyLower.getChildren().addAll(rgLeftLeg, rgRightLeg);
-
-        // Center mid body
-        hbBodyLower.setAlignment(Pos.CENTER);
-
-        // Add mid body to body
-        vbBody.getChildren().add(hbBodyLower);
-
+        // Add the head to the body
+        gBody.getChildren().addAll(rgHead,
+                rgLeftArm, rgTorso, rgRightArm,
+                rgLeftLeg, rgRightLeg);
     }
 
     public void handleWalk(String direction) {
+        // Setting the duration of the transition  
+        translateTransition.setDuration(Duration.millis(1));
+
+        // Setting the node for the transition 
+        translateTransition.setNode(gBody);
+
+        // Setting the cycle count for the transition 
+        translateTransition.setCycleCount(animationMultiple);
+
+        // Setting the value of the transition along the y axis. 
+        translateTransition.setByY(0);
+
         if (direction.equals("left")) { // Move left
-            //Creating Translate Transition 
-            TranslateTransition translateTransition = new TranslateTransition();
+            // Setting the value of the transition along the x axis. 
+            translateTransition.setByX(-playerSpeed);
 
-            //Setting the duration of the transition  
-            translateTransition.setDuration(Duration.millis(1000));
-
-            //Setting the node for the transition 
-            translateTransition.setNode(vbBody);
-
-            //Setting the value of the transition along the x axis. 
-            translateTransition.setByX(100);
-
-            //Setting the cycle count for the transition 
-            translateTransition.setCycleCount(1);
-
-            //Setting auto reverse value to false 
-            translateTransition.setAutoReverse(true);
-
-            //Playing the animation 
+            // Playing the animation 
             translateTransition.play();
-
-            //Creating a Group object  
-            Group root = new Group(vbBody);
-            
-            main.getChildren().add(root);
         } else if (direction.equals("right")) { // Move Right
+            // Setting the value of the transition along the x axis. 
+            translateTransition.setByX(playerSpeed);
 
+            // Playing the animation 
+            translateTransition.play();
         }
+    }
+
+    public void handleJump() {
+        // Setting the duration of the transition  
+        translateTransition.setDuration(Duration.millis(250));
+
+        // Setting the node for the transition 
+        translateTransition.setNode(gBody);
+
+        // Setting the cycle count for the transition 
+        translateTransition.setCycleCount(animationMultiple);
+
+        // Setting the value of the transition along the x axis. 
+        translateTransition.setByX(0);
+
+        // Setting the value of the transition along the y axis. 
+        translateTransition.setByY(-playerSpeed * playerSpeed);
+
+        // Playing the animation 
+        translateTransition.play();
+
+        // Setting the value of the transition along the y axis. 
+        translateTransition.setByY(playerSpeed * playerSpeed);
+
+        // Playing the animation 
+        translateTransition.play();
     }
 
     public static void main(String[] args) {
