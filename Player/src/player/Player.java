@@ -44,6 +44,7 @@ public class Player extends Application {
     // Player Movement
     TranslateTransition translateTransition = new TranslateTransition();
     private final int playerSpeed = 6;
+    private final int playerAngleWalk = 45;
     private final int animationMultiple = 1;
 
     // Group for body
@@ -144,12 +145,12 @@ public class Player extends Application {
 
         if (direction.equals("left")) { // Move left
             // Rotate left leg
-            rgLeftLeg.getTransforms().add(new Rotate(-45,
+            rgLeftLeg.getTransforms().add(new Rotate(-playerAngleWalk,
                     rgLeftLeg.getX() + rgLeftLeg.getWidth() / 2,
                     rgLeftLeg.getY()));
 
             // Rotate right leg
-            rgRightLeg.getTransforms().add(new Rotate(-45,
+            rgRightLeg.getTransforms().add(new Rotate(-playerAngleWalk,
                     rgRightLeg.getX() + rgRightLeg.getWidth() / 2,
                     rgRightLeg.getY()));
             
@@ -160,12 +161,12 @@ public class Player extends Application {
             translateTransition.play();
         } else if (direction.equals("right")) { // Move Right
             // Rotate left leg
-            rgLeftLeg.getTransforms().add(new Rotate(45,
+            rgLeftLeg.getTransforms().add(new Rotate(playerAngleWalk,
                     rgLeftLeg.getX() + rgLeftLeg.getWidth() / 2,
                     rgLeftLeg.getY()));
 
             // Rotate right leg
-            rgRightLeg.getTransforms().add(new Rotate(45,
+            rgRightLeg.getTransforms().add(new Rotate(playerAngleWalk,
                     rgRightLeg.getX() + rgRightLeg.getWidth() / 2,
                     rgRightLeg.getY()));
 
