@@ -15,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -42,7 +43,7 @@ public class Player extends Application {
 
     // Player Movement
     TranslateTransition translateTransition = new TranslateTransition();
-    private final int playerSpeed = 3;
+    private final int playerSpeed = 6;
     private final int animationMultiple = 1;
 
     // Group for body
@@ -110,20 +111,20 @@ public class Player extends Application {
         rgRightArm.setY(rgHead.getHeight());
 
         // Rectangle for left leg
-        rgLeftLeg.setArcHeight(5);
-        rgLeftLeg.setArcWidth(5);
-        rgLeftLeg.setFill(Color.web("d88c68"));
-        rgLeftLeg.setX(rgTorso.getX() + rgLeftLeg.getWidth() * 2
-                - rgLeftLeg.getWidth() / 3);
-        rgLeftLeg.setY(rgHead.getHeight() + rgTorso.getWidth());
-
-        // Rectangle for right leg
         rgRightLeg.setArcHeight(5);
         rgRightLeg.setArcWidth(5);
         rgRightLeg.setFill(Color.web("d88c68"));
-        rgRightLeg.setX(rgTorso.getX() + rgTorso.getWidth()
-                - rgRightLeg.getWidth() * 3 + rgRightLeg.getWidth() / 3);
+        rgRightLeg.setX(rgTorso.getX() + rgLeftLeg.getWidth() * 2
+                - rgLeftLeg.getWidth() / 3);
         rgRightLeg.setY(rgHead.getHeight() + rgTorso.getWidth());
+
+        // Rectangle for right leg
+        rgLeftLeg.setArcHeight(5);
+        rgLeftLeg.setArcWidth(5);
+        rgLeftLeg.setFill(Color.web("d88c68"));
+        rgLeftLeg.setX(rgTorso.getX() + rgTorso.getWidth()
+                - rgRightLeg.getWidth() * 3 + rgRightLeg.getWidth() / 3);
+        rgLeftLeg.setY(rgHead.getHeight() + rgTorso.getWidth());
 
         // Add the head to the body
         gBody.getChildren().addAll(rgHead,
@@ -141,16 +142,33 @@ public class Player extends Application {
         // Setting the cycle count for the transition 
         translateTransition.setCycleCount(animationMultiple);
 
-        // Setting the value of the transition along the y axis. 
-        translateTransition.setByY(0);
-
         if (direction.equals("left")) { // Move left
+            // Rotate left leg
+            rgLeftLeg.getTransforms().add(new Rotate(-45,
+                    rgLeftLeg.getX() + rgLeftLeg.getWidth() / 2,
+                    rgLeftLeg.getY()));
+
+            // Rotate right leg
+            rgRightLeg.getTransforms().add(new Rotate(-45,
+                    rgRightLeg.getX() + rgRightLeg.getWidth() / 2,
+                    rgRightLeg.getY()));
+            
             // Setting the value of the transition along the x axis. 
             translateTransition.setByX(-playerSpeed);
 
             // Playing the animation 
             translateTransition.play();
         } else if (direction.equals("right")) { // Move Right
+            // Rotate left leg
+            rgLeftLeg.getTransforms().add(new Rotate(45,
+                    rgLeftLeg.getX() + rgLeftLeg.getWidth() / 2,
+                    rgLeftLeg.getY()));
+
+            // Rotate right leg
+            rgRightLeg.getTransforms().add(new Rotate(45,
+                    rgRightLeg.getX() + rgRightLeg.getWidth() / 2,
+                    rgRightLeg.getY()));
+
             // Setting the value of the transition along the x axis. 
             translateTransition.setByX(playerSpeed);
 
