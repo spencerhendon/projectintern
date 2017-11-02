@@ -7,11 +7,13 @@
 package player;
 
 // Imports
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -43,9 +45,13 @@ public class Player extends Application {
 
     // Player Movement
     TranslateTransition translateTransition = new TranslateTransition();
-    private final int playerSpeed = 6;
-    private final int playerAngleWalk = 45;
+    Timeline jump = new Timeline();
+    private final int playerSpeedWalk = 6;
+    private final int playerSpeedJump = 75;
+    private final int playerHeightJump = 500;
+    private final int playerAngleWalk = 25;
     private final int animationMultiple = 1;
+    private final String playerState = "forward"; // forward, backward, walk
 
     // Group for body
     Group gBody = new Group();
@@ -60,6 +66,7 @@ public class Player extends Application {
 
         // Draw body
         drawBody();
+        setAnimations();
 
         // Add the body to the pane
         main.setCenter(gBody);
@@ -90,31 +97,31 @@ public class Player extends Application {
 
     public void drawBody() {
         // Rectangle for head
-        rgHead.setFill(Color.web("d88c68"));
+        rgHead.setFill(Color.web("ff0000"));
         rgHead.setX(rgLeftArm.getWidth() + rgTorso.getWidth() / 2 - rgHead.getWidth() / 2);
 
         // Rectangle for left arm
         rgLeftArm.setArcHeight(5);
         rgLeftArm.setArcWidth(5);
-        rgLeftArm.setFill(Color.web("d88c68"));
+        rgLeftArm.setFill(Color.web("0000ff"));
         rgLeftArm.setY(rgHead.getHeight());
 
         // Rectangle for torso
-        rgTorso.setFill(Color.web("d88c68"));
+        rgTorso.setFill(Color.web("000000"));
         rgTorso.setX(rgLeftArm.getWidth());
         rgTorso.setY(rgHead.getHeight());
 
         // Rectangle for right arm
         rgRightArm.setArcHeight(5);
         rgRightArm.setArcWidth(5);
-        rgRightArm.setFill(Color.web("d88c68"));
+        rgRightArm.setFill(Color.web("0000ff"));
         rgRightArm.setX(rgLeftArm.getWidth() + rgTorso.getWidth());
         rgRightArm.setY(rgHead.getHeight());
 
         // Rectangle for left leg
         rgRightLeg.setArcHeight(5);
         rgRightLeg.setArcWidth(5);
-        rgRightLeg.setFill(Color.web("d88c68"));
+        rgRightLeg.setFill(Color.web("00ff00"));
         rgRightLeg.setX(rgTorso.getX() + rgLeftLeg.getWidth() * 2
                 - rgLeftLeg.getWidth() / 3);
         rgRightLeg.setY(rgHead.getHeight() + rgTorso.getWidth());
@@ -122,7 +129,7 @@ public class Player extends Application {
         // Rectangle for right leg
         rgLeftLeg.setArcHeight(5);
         rgLeftLeg.setArcWidth(5);
-        rgLeftLeg.setFill(Color.web("d88c68"));
+        rgLeftLeg.setFill(Color.web("00ff00"));
         rgLeftLeg.setX(rgTorso.getX() + rgTorso.getWidth()
                 - rgRightLeg.getWidth() * 3 + rgRightLeg.getWidth() / 3);
         rgLeftLeg.setY(rgHead.getHeight() + rgTorso.getWidth());
@@ -131,6 +138,18 @@ public class Player extends Application {
         gBody.getChildren().addAll(rgHead,
                 rgLeftArm, rgTorso, rgRightArm,
                 rgLeftLeg, rgRightLeg);
+    }
+    
+    public void setAnimations() {
+        // Create all key frames for jump
+        KeyValue kvJump = new KeyValue(gBody.translateYProperty(),
+                -playerHeightJump);
+        KeyFrame kfJump = new KeyFrame(Duration.millis(playerSpeedJump), kvJump);
+        
+        // Setup jump timeline
+        jump.setCycleCount(2);
+        jump.setAutoReverse(true);
+        jump.getKeyFrames().add(kfJump);
     }
 
     public void handleWalk(String direction) {
@@ -153,9 +172,9 @@ public class Player extends Application {
             rgRightLeg.getTransforms().add(new Rotate(-playerAngleWalk,
                     rgRightLeg.getX() + rgRightLeg.getWidth() / 2,
                     rgRightLeg.getY()));
-            
+
             // Setting the value of the transition along the x axis. 
-            translateTransition.setByX(-playerSpeed);
+            translateTransition.setByX(-playerSpeedWalk);
 
             // Playing the animation 
             translateTransition.play();
@@ -171,7 +190,7 @@ public class Player extends Application {
                     rgRightLeg.getY()));
 
             // Setting the value of the transition along the x axis. 
-            translateTransition.setByX(playerSpeed);
+            translateTransition.setByX(playerSpeedWalk);
 
             // Playing the animation 
             translateTransition.play();
@@ -179,29 +198,7 @@ public class Player extends Application {
     }
 
     public void handleJump() {
-        // Setting the duration of the transition  
-        translateTransition.setDuration(Duration.millis(250));
-
-        // Setting the node for the transition 
-        translateTransition.setNode(gBody);
-
-        // Setting the cycle count for the transition 
-        translateTransition.setCycleCount(animationMultiple);
-
-        // Setting the value of the transition along the x axis. 
-        translateTransition.setByX(0);
-
-        // Setting the value of the transition along the y axis. 
-        translateTransition.setByY(-playerSpeed * playerSpeed);
-
-        // Playing the animation 
-        translateTransition.play();
-
-        // Setting the value of the transition along the y axis. 
-        translateTransition.setByY(playerSpeed * playerSpeed);
-
-        // Playing the animation 
-        translateTransition.play();
+        jump.play();
     }
 
     public static void main(String[] args) {
