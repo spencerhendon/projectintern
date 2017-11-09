@@ -10,7 +10,6 @@ package map;
 import javafx.scene.layout.BorderPane;
 
 public class Elevator extends BorderPane {
-
     // Width and height
     private final double WIDTH, HEIGHT;
 
