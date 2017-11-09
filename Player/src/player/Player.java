@@ -11,10 +11,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -48,13 +47,12 @@ public class Player extends Application {
     Timeline tlWalkLeft = new Timeline();
     Timeline tlWalkRight = new Timeline();
     Timeline tlJump = new Timeline();
-    private final int playerSpeedWalk = 500;
+    private final int playerSpeedWalk = 250;
     private final int playerSpeedJump = 125;
     private final int playerDistanceJump = 50;
-    private final int playerDistanceWalk = 25;
+    private final int playerDistanceWalk = 50;
     private final int playerAngleWalk = 25;
     private String playerState = "front"; // front, back, sideLeft, sideRight
-    private boolean isPlayerWalking = false;
 
     // Roations for legs
     Rotate rtLeftLeg;
@@ -90,35 +88,33 @@ public class Player extends Application {
             if (null != e.getCode()) {
                 // Reset animations
                 tlWalkLeft.getKeyFrames().clear();
-                rgLeftLeg.getTransforms().clear();
-                rgRightLeg.getTransforms().clear();
+                tlWalkRight.getKeyFrames().clear();
+
                 setAnimations();
-                switch (e.getCode()) {
-                    case A:
-                        // Change body to left side
-                        changeState("sideLeft");
-                        // Move left
-                        handleWalk("left");
-                        break;
-                    case D:
-                        // Change body to right side
-                        changeState("sideRight");
-                        // Move Right
-                        handleWalk("right");
-                        break;
-                    case W:
-                        // Change body to front
-                        changeState("back");
-                        // Jump
-                        handleJump();
-                        break;
-                    case S:
-                        // Change body to right side
-                        changeState("front");
-                        break;
-                    default:
-                        break;
-                }
+                if (e.getCode() == KeyCode.A) {
+                    // Change body to left side
+                    changeState("sideLeft");
+                    // Move left
+                    handleWalk("left");
+                } else if (e.getCode() == KeyCode.D) {
+                    // Change body to right side
+                    changeState("sideRight");
+                    // Move Right
+                    handleWalk("right");
+                } else if (e.getCode() == KeyCode.W) {
+                    // Change body to front
+                    changeState("back");
+                    // Jump
+                    handleJump();
+                } else if (e.getCode() == KeyCode.S) {
+                    // Change body to right side
+                    changeState("front");
+                } //else if (e.getCode() == KeyCodeCombination(KeyCode.A, KeyCode.W)) {
+                    // Change body to left side
+                    //changeState("sideLeft");
+                    // Move left
+                    //handleWalk("left");
+                //}
             }
         });
 
@@ -163,16 +159,13 @@ public class Player extends Application {
         tlWalkLeft.setCycleCount(1);
         tlWalkLeft.setAutoReverse(false);
         tlWalkLeft.getKeyFrames().addAll(kfWalkLeftF1, kfWalkLeftF2, kfWalkLeftF3, kfWalkLeftF4, kfWalkLeftF5);
-        tlWalkLeft.setOnFinished(e -> {
-            isPlayerWalking = false;
-        });
 
         // Animate walking right
         KeyValue kvWalkRightF1LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
         KeyValue kvWalkRightF1LR = new KeyValue(rtRightLeg.angleProperty(), -playerAngleWalk);
         KeyValue kvWalkRightF2LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
         KeyValue kvWalkRightF2LR = new KeyValue(rtRightLeg.angleProperty(), 0);
-        KeyValue kvWalkRightF3WF = new KeyValue(gBody.translateXProperty(), gBody.getTranslateX() - playerDistanceWalk);
+        KeyValue kvWalkRightF3WF = new KeyValue(gBody.translateXProperty(), gBody.getTranslateX() + playerDistanceWalk);
         KeyValue kvWalkRightF4LL = new KeyValue(rtLeftLeg.angleProperty(), -playerAngleWalk);
         KeyValue kvWalkRightF4LR = new KeyValue(rtRightLeg.angleProperty(), 0);
         KeyValue kvWalkRightF5LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
@@ -185,24 +178,15 @@ public class Player extends Application {
         tlWalkRight.setCycleCount(1);
         tlWalkRight.setAutoReverse(false);
         tlWalkRight.getKeyFrames().addAll(kfWalkRightF1, kfWalkRightF2, kfWalkRightF3, kfWalkRightF4, kfWalkRightF5);
-        tlWalkRight.setOnFinished(e -> {
-            isPlayerWalking = false;
-        });
     }
 
     public void handleWalk(String direction) {
         if (direction.equals("left")) { // Move left
-            if (isPlayerWalking == false) {
-                // Play the animation 
-                tlWalkLeft.play();
-                isPlayerWalking = true;
-            }
+            // Play the animation 
+            tlWalkLeft.play();
         } else if (direction.equals("right")) { // Move Right
-            if (isPlayerWalking == false) {
-                // Play the animation 
-                tlWalkRight.play();
-                isPlayerWalking = true;
-            }
+            // Play the animation 
+            tlWalkRight.play();
         }
     }
 
