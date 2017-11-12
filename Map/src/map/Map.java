@@ -17,7 +17,7 @@ import javafx.stage.Stage;
 public class Map extends Application {
 
     // Width and height
-    private final double WIDTH = 1280, HEIGHT = 720;
+    private final double WIDTH = 1920, HEIGHT = 1080;
 
     // Title
     private final String title = "Map";
