@@ -28,7 +28,7 @@ public class ProjectIntern extends Application {
     private final String title = "Project: Intern";
 
     // Game Version
-    private final String GAME_VERSION = "DRINK MO WUTAR, O U MITE DIE!"; // Game version... i += 0.005'
+    private final String GAME_VERSION = "1.005"; // Game version... i += 0.005'
 
     // Title Screen Pane
     TitleScreen paneTitle = new TitleScreen(WIDTH, HEIGHT, GAME_VERSION);
@@ -47,40 +47,77 @@ public class ProjectIntern extends Application {
         // Handle player actions
         scGame.setOnKeyPressed(e -> {
             if (paneTitle.getChildren().contains(paneTitle.paneGame)) {
-                // Player movement
-                if (null != e.getCode()) switch (e.getCode()) {
-                    case UP:
-                        paneTitle.paneGame.move("UP");
-                        break;
-                    case DOWN:
-                        paneTitle.paneGame.move("DOWN");
-                        break;
-                    case RIGHT:
-                        paneTitle.paneGame.move("RIGHT");
-                        break;
-                    case LEFT:
-                        paneTitle.paneGame.move("LEFT");
-                        break;
-                    default:
-                        break;
+                // Handle walking
+                if (null != e.getCode()) {
+                    // Reset animations
+                    paneTitle.paneGame.player.setAnimations();
+
+                    if (null != e.getCode()) {
+                        switch (e.getCode()) {
+                            case A:
+                                // Change body to left side
+                                paneTitle.paneGame.player.changeState("sideLeft");
+                                paneTitle.paneGame.player.tlWalkLeft.play();
+                                paneTitle.paneGame.player.setVelocityX(-5);
+                                break;
+                            case D:
+                                // Change body to right side
+                                paneTitle.paneGame.player.changeState("sideRight");
+                                paneTitle.paneGame.player.tlWalkRight.play();
+                                paneTitle.paneGame.player.setVelocityX(5);
+                                break;
+                            case W:
+                                // Change body to front
+                                paneTitle.paneGame.player.changeState("back");
+                                break;
+                            case S:
+                                // Change body to right side
+                                paneTitle.paneGame.player.changeState("front");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
                 }
-                
-                // Change color of dummy every key push     
-                int rand = (int)(Math.random() * (4 - 1) + 1);
-                
-                if (rand == 1) {
-                    paneTitle.paneGame.dummy.setFill(Color.RED);
-                    paneTitle.setStyle("-fx-background-color: #" + "0000ff");
-                } else if (rand == 2) {
-                    paneTitle.paneGame.dummy.setFill(Color.LIGHTGREEN);
-                    paneTitle.setStyle("-fx-background-color: #" + "ff0000");
-                } else if (rand == 3) {
-                    paneTitle.paneGame.dummy.setFill(Color.BLUE);
-                    paneTitle.setStyle("-fx-background-color: #" + "00ff00");
+            }
+
+        });
+
+        scGame.setOnKeyReleased(e -> {
+            if (paneTitle.getChildren().contains(paneTitle.paneGame)) {
+                // Handle walking
+                if (null != e.getCode()) {
+                    // Reset animations
+                    paneTitle.paneGame.player.setAnimations();
+
+                    if (null != e.getCode()) {
+                        if (null != e.getCode()) {
+                            switch (e.getCode()) {
+                                case A:
+                                    if (paneTitle.paneGame.player.getVelocityX() == -5) {
+                                        paneTitle.paneGame.player.setVelocityX(0);
+                                    }
+                                    break;
+                                case D:
+                                    if (paneTitle.paneGame.player.getVelocityX() == 5) {
+                                        paneTitle.paneGame.player.setVelocityX(0);
+                                    }
+                                    break;
+                                case W:
+                                    paneTitle.paneGame.player.setVelocityY(0);
+                                    break;
+                                case S:
+                                    paneTitle.paneGame.player.setVelocityX(0);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }
+
+                    }
                 }
 
-            } else {
-                // Nothing... You are not in the game field
             }
         });
 

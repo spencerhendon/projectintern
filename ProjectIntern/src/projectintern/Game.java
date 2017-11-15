@@ -13,7 +13,6 @@ package projectintern;
 // Imports
 import javafx.geometry.Insets;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import projectintern.Entity.Player;
 
@@ -27,13 +26,16 @@ public class Game extends BorderPane {
     Player player;
 
     // Hitbox for player
-    Rectangle dummy = new Rectangle(1, 1);
+    Rectangle dummy;
 
     public Game(double w, double h, Player player) {
         // Get width and height
         this.WIDTH = w;
         this.HEIGHT = h;
         this.player = player;
+        
+        // Get a collision box for the player
+        dummy = new Rectangle(player.getBoundsInParent().getWidth(), player.getBoundsInParent().getHeight());
 
         // Setup this borderpane
         this.setWidth(WIDTH);
@@ -44,11 +46,7 @@ public class Game extends BorderPane {
     }
 
     public void displayPlayer() {
-        dummy.setX(WIDTH / 2 - dummy.getWidth() / 2);
-        dummy.setY(HEIGHT / 2 - dummy.getHeight() / 2);
-        dummy.setFill(Color.RED);
-
-        getChildren().add(dummy);
+        getChildren().add(player);
     }
 
     public void move(String direction) {

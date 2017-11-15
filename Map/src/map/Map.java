@@ -28,6 +28,8 @@ public class Map extends Application {
     // Scene
     Scene scene = new Scene(main, WIDTH, HEIGHT);
 
+    // Number of floors
+    private final int NUMFLOORS = 10;
     // Vbox for floors
     VBox vbFloors = new VBox((HEIGHT / 6));
 
@@ -43,12 +45,9 @@ public class Map extends Application {
         stage.show();
 
         // Create floors
-        Floor flOne = new Floor(WIDTH - (HEIGHT / 6), HEIGHT / 6, String.valueOf(vbFloors.getChildren().size() + 1));
-        Floor flTwo = new Floor(WIDTH - (HEIGHT / 6), HEIGHT / 6, String.valueOf(vbFloors.getChildren().size() + 1));
-        Floor flThree = new Floor(WIDTH - (HEIGHT / 6), HEIGHT / 6, String.valueOf(vbFloors.getChildren().size() + 1));
-        Floor flFour = new Floor(WIDTH - (HEIGHT / 6), HEIGHT / 6, String.valueOf(vbFloors.getChildren().size() + 1));
-        Floor flFive = new Floor(WIDTH - (HEIGHT / 6), HEIGHT / 6, String.valueOf(vbFloors.getChildren().size() + 1));
-        vbFloors.getChildren().addAll(flOne, flTwo, flThree, flFour, flFive);
+        for (int i = 0; i < NUMFLOORS; i++) {
+            vbFloors.getChildren().add(new Floor(WIDTH - (HEIGHT / 6), HEIGHT / 6, NUMFLOORS - i));
+        }
 
         // Center the vb (top/right/bottom/left)
         vbFloors.setPadding(new Insets((HEIGHT - (vbFloors.getChildren().size() * (HEIGHT / 6))) / 2, (HEIGHT / 6) / 2,

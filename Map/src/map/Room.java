@@ -45,7 +45,7 @@ public class Room extends BorderPane {
     public void draw() {
         // Draw Background
         Rectangle rgB = new Rectangle(WIDTH, HEIGHT);
-        rgB.setFill(Color.RED);
+        rgB.setFill(Color.TRANSPARENT);
         this.getChildren().add(rgB);
 
         // Three different types of rooms... Storage, Restroom, Office
@@ -53,12 +53,16 @@ public class Room extends BorderPane {
         int random = (int) (Math.random() * 3 + 1);
         
         // Create a room
-        if (random == 1) {
-            drawOffice();
-        } else if (random == 2) {
-            drawStorage();
-        } else {
-            drawRestroom();
+        switch (random) {
+            case 1:
+                drawOffice();
+                break;
+            case 2:
+                drawStorage();
+                break;
+            default:
+                drawRestroom();
+                break;
         }
     }
 
@@ -178,13 +182,13 @@ public class Room extends BorderPane {
     public void drawRestroom() { // Toilet and sink
         // Draw toilet
         Rectangle rgTL = new Rectangle(WIDTH / 8, (HEIGHT / (HEIGHT / 4)));
-        rgTL.setFill(Color.web("ffffff"));
+        rgTL.setFill(Color.web("a5a5a5"));
         gToilet.getChildren().add(rgTL);
         
         Rectangle rgTT = new Rectangle(WIDTH / 10, HEIGHT / 10);
         rgTT.setX(rgTL.getWidth() / 2 - rgTT.getWidth() / 2);
         rgTT.setY(rgTL.getHeight());
-        rgTT.setFill(Color.web("f0f0f0"));
+        rgTT.setFill(Color.web("bfbfbf"));
         gToilet.getChildren().add(rgTT);
         
         Polygon rgTB = new Polygon();
@@ -194,13 +198,13 @@ public class Room extends BorderPane {
             rgTL.getWidth() * 0.85, rgTT.getY() + rgTT.getHeight() + rgTL.getHeight() * 3,
             rgTL.getWidth() * 0.15, rgTT.getY() + rgTT.getHeight() + rgTL.getHeight() * 3,
         });
-        rgTB.setFill(Color.web("f0f0f0"));
+        rgTB.setFill(Color.web("bfbfbf"));
         gToilet.getChildren().add(rgTB);
         
         Rectangle rgTS = new Rectangle(rgTL.getWidth() / 2, rgTL.getHeight() * 2);
         rgTS.setX(rgTL.getWidth() / 2 - rgTS.getWidth() / 2);
         rgTS.setY(rgTB.getBoundsInParent().getMaxY());
-        rgTS.setFill(Color.web("e1e1e1"));
+        rgTS.setFill(Color.web("bfbfbf"));
         gToilet.getChildren().add(rgTS);
         
         // Position toilet
@@ -227,13 +231,13 @@ public class Room extends BorderPane {
         hbSinkHandles.getChildren().add(rgSHR);
         
         Rectangle rgST = new Rectangle(WIDTH / 8, (HEIGHT / (HEIGHT / 8)));
-        rgST.setFill(Color.web("ffffff"));
+        rgST.setFill(Color.web("a5a5a5"));
         gSink.getChildren().add(rgST);
         
         Rectangle rgSS = new Rectangle(rgST.getWidth() / 2, rgST.getHeight() * 4);
         rgSS.setX(rgST.getWidth() / 2 - rgSS.getWidth() / 2);
         rgSS.setY(rgST.getY() + rgST.getHeight());
-        rgSS.setFill(Color.web("e1e1e1"));
+        rgSS.setFill(Color.web("bfbfbf"));
         gSink.getChildren().add(rgSS);
         
         // Position sink

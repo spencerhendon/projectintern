@@ -17,16 +17,20 @@ public class Floor extends BorderPane {
     
      // Door width and height
     private final double WIDTHDOOR, HEIGHTDOOR;
+    
     // Floor number
-    private final String floorNum;
+    private final int FLOORNUM;
 
     // Doors
     Door doors[] = new Door[5];
+    
+    // Elevator
+    Elevator elevator;
 
-    public Floor(double WIDTH, double HEIGHT, String floorNum) {
+    public Floor(double WIDTH, double HEIGHT, int FLOORNUM) {
         this.WIDTH = WIDTH;
         this.HEIGHT = HEIGHT;
-        this.floorNum = floorNum;
+        this.FLOORNUM = FLOORNUM;
         this.WIDTHDOOR = WIDTH / 25;
         this.HEIGHTDOOR = HEIGHT / 1.75;
 
@@ -75,5 +79,10 @@ public class Floor extends BorderPane {
             // Add door to pane
             this.getChildren().add(doors[i]);
         }
+        
+        // Elevator
+        elevator = new Elevator(WIDTH - ((WIDTHDOOR * 25 + HEIGHTDOOR * 1.75)  / ((2.0/3.0) * 10)) * 5 - WIDTHDOOR, HEIGHT - 2, FLOORNUM, "closed");
+        elevator.setTranslateX(WIDTH - elevator.getBoundsInParent().getWidth());
+        this.getChildren().add(elevator);
     }
 }

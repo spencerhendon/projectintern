@@ -262,7 +262,7 @@ public class TitleScreen extends BorderPane {
     private void game(String name, String loadout) {
         // Create player
         player = new Player(name, loadout,
-                        0, 0, 0);
+                        0, 0, 0, WIDTH, HEIGHT);
         
         // Remove pane for new game
         getChildren().remove(paneNewGame);

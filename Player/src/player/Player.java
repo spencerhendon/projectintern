@@ -7,13 +7,13 @@
 package player;
 
 // Imports
+import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -36,6 +36,7 @@ public class Player extends Application {
     Scene scene = new Scene(main, WIDTH, HEIGHT);
 
     // Rectangles for the body
+    Group gBody = new Group();
     Rectangle rgHead = new Rectangle(HEIGHT / 48, HEIGHT / 48);
     Rectangle rgTorso = new Rectangle(HEIGHT / 30, HEIGHT / 30);
     Rectangle rgLeftArm = new Rectangle(HEIGHT / 90, HEIGHT / 40);
@@ -43,23 +44,20 @@ public class Player extends Application {
     Rectangle rgLeftLeg = new Rectangle(HEIGHT / 90, HEIGHT / 36);
     Rectangle rgRightLeg = new Rectangle(HEIGHT / 90, HEIGHT / 36);
 
-    // Player Movement
+    // Player Animation...
+    Rotate rtLeftLeg;
+    Rotate rtRightLeg;
     Timeline tlWalkLeft = new Timeline();
     Timeline tlWalkRight = new Timeline();
-    Timeline tlJump = new Timeline();
     private final int playerSpeedWalk = 250;
-    private final int playerSpeedJump = 125;
-    private final int playerDistanceJump = 50;
-    private final int playerDistanceWalk = 50;
     private final int playerAngleWalk = 25;
     private String playerState = "front"; // front, back, sideLeft, sideRight
 
-    // Roations for legs
-    Rotate rtLeftLeg;
-    Rotate rtRightLeg;
-
-    // Group for body
-    Group gBody = new Group();
+    // Player Movement
+    private double positionX = WIDTH / 2;
+    private double positionY = HEIGHT / 2;
+    private double velocityX = 0;
+    private double velocityY = 0;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -77,55 +75,90 @@ public class Player extends Application {
                 rgLeftArm, rgLeftLeg, rgRightLeg,
                 rgTorso, rgRightArm);
 
+        gBody.setTranslateX(positionX);
+        gBody.setTranslateY(positionY);
+
+        main.getChildren().add(gBody);
+
         // Setup animations
         setAnimations();
-
-        // Add the body to the pane
-        main.setCenter(gBody);
+        
+        
 
         // Handle walking
         scene.setOnKeyPressed(e -> {
             if (null != e.getCode()) {
                 // Reset animations
-                tlWalkLeft.getKeyFrames().clear();
-                tlWalkRight.getKeyFrames().clear();
-
                 setAnimations();
-                if (e.getCode() == KeyCode.A) {
-                    // Change body to left side
-                    changeState("sideLeft");
-                    // Move left
-                    handleWalk("left");
-                } else if (e.getCode() == KeyCode.D) {
-                    // Change body to right side
-                    changeState("sideRight");
-                    // Move Right
-                    handleWalk("right");
-                } else if (e.getCode() == KeyCode.W) {
-                    // Change body to front
-                    changeState("back");
-                    // Jump
-                    handleJump();
-                } else if (e.getCode() == KeyCode.S) {
-                    // Change body to right side
-                    changeState("front");
-                } //else if (e.getCode() == KeyCodeCombination(KeyCode.A, KeyCode.W)) {
-                    // Change body to left side
-                    //changeState("sideLeft");
-                    // Move left
-                    //handleWalk("left");
-                //}
+                
+                if (null != e.getCode()) switch (e.getCode()) {
+                    case A:
+                        // Change body to left side
+                        changeState("sideLeft");
+                        tlWalkLeft.play();
+                        velocityX = -5;
+                        break;
+                    case D:
+                        // Change body to right side
+                        changeState("sideRight");
+                        tlWalkRight.play();
+                        velocityX = 5;
+                        break;
+                    case W:
+                        // Change body to front
+                        changeState("back");
+                        break;
+                    case S:
+                        // Change body to right side
+                        changeState("front");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        
+        scene.setOnKeyReleased(e -> {
+            if (null != e.getCode()) {
+                if (null != e.getCode()) switch (e.getCode()) {
+                    case A:
+                        if (velocityX == -5) {
+                            velocityX = 0;
+                        }
+                        break;
+                    case D:
+                        if (velocityX == 5) {
+                            velocityX = 0;
+                        }
+                        break;
+                    case W:
+                        velocityY = 0;
+                        break;
+                    case S:
+                        velocityY = 0;
+                        break;
+                    default:
+                        break;
+                } 
             }
         });
 
+        
+        // Game loop;
+        AnimationTimer gameLoop = new GameTimer();
+        gameLoop.start();
     }
-
+ 
     public void setAnimations() {
+        // Reset animations
+        tlWalkLeft.getKeyFrames().clear();
+        tlWalkRight.getKeyFrames().clear();
+
         // Define walking rotations
         rtLeftLeg = new Rotate(0,
                 rgLeftLeg.getX() + rgLeftLeg.getWidth() / 2,
                 rgLeftLeg.getY());
-
+        
         rtRightLeg = new Rotate(0,
                 rgRightLeg.getX() + rgRightLeg.getWidth() / 2,
                 rgRightLeg.getY());
@@ -133,65 +166,39 @@ public class Player extends Application {
         rgLeftLeg.getTransforms().add(rtLeftLeg);
         rgRightLeg.getTransforms().add(rtRightLeg);
 
-        // Animate jumping
-        KeyValue kvJump = new KeyValue(gBody.translateYProperty(),
-                -playerDistanceJump);
-        KeyFrame kfJump = new KeyFrame(Duration.millis(playerSpeedJump), kvJump);
-        tlJump.setCycleCount(2);
-        tlJump.setAutoReverse(true);
-        tlJump.getKeyFrames().add(kfJump);
-
         // Animate walking left
         KeyValue kvWalkLeftF1LL = new KeyValue(rtLeftLeg.angleProperty(), playerAngleWalk);
         KeyValue kvWalkLeftF1LR = new KeyValue(rtRightLeg.angleProperty(), 0);
         KeyValue kvWalkLeftF2LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
         KeyValue kvWalkLeftF2LR = new KeyValue(rtRightLeg.angleProperty(), 0);
-        KeyValue kvWalkLeftF3WF = new KeyValue(gBody.translateXProperty(), gBody.getTranslateX() - playerDistanceWalk);
         KeyValue kvWalkLeftF4LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
         KeyValue kvWalkLeftF4LR = new KeyValue(rtRightLeg.angleProperty(), playerAngleWalk);
         KeyValue kvWalkLeftF5LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
         KeyValue kvWalkLeftF5LR = new KeyValue(rtRightLeg.angleProperty(), 0);
         KeyFrame kfWalkLeftF1 = new KeyFrame(Duration.millis((playerSpeedWalk / 4) * 1), kvWalkLeftF1LL, kvWalkLeftF1LR);
         KeyFrame kfWalkLeftF2 = new KeyFrame(Duration.millis((playerSpeedWalk / 4) * 2), kvWalkLeftF2LL, kvWalkLeftF2LR);
-        KeyFrame kfWalkLeftF3 = new KeyFrame(Duration.millis(playerSpeedWalk), kvWalkLeftF3WF);
         KeyFrame kfWalkLeftF4 = new KeyFrame(Duration.millis((playerSpeedWalk / 4) * 3), kvWalkLeftF4LL, kvWalkLeftF4LR);
         KeyFrame kfWalkLeftF5 = new KeyFrame(Duration.millis((playerSpeedWalk / 4) * 4), kvWalkLeftF5LL, kvWalkLeftF5LR);
         tlWalkLeft.setCycleCount(1);
         tlWalkLeft.setAutoReverse(false);
-        tlWalkLeft.getKeyFrames().addAll(kfWalkLeftF1, kfWalkLeftF2, kfWalkLeftF3, kfWalkLeftF4, kfWalkLeftF5);
+        tlWalkLeft.getKeyFrames().addAll(kfWalkLeftF1, kfWalkLeftF2, kfWalkLeftF4, kfWalkLeftF5);
 
         // Animate walking right
         KeyValue kvWalkRightF1LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
         KeyValue kvWalkRightF1LR = new KeyValue(rtRightLeg.angleProperty(), -playerAngleWalk);
         KeyValue kvWalkRightF2LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
         KeyValue kvWalkRightF2LR = new KeyValue(rtRightLeg.angleProperty(), 0);
-        KeyValue kvWalkRightF3WF = new KeyValue(gBody.translateXProperty(), gBody.getTranslateX() + playerDistanceWalk);
         KeyValue kvWalkRightF4LL = new KeyValue(rtLeftLeg.angleProperty(), -playerAngleWalk);
         KeyValue kvWalkRightF4LR = new KeyValue(rtRightLeg.angleProperty(), 0);
         KeyValue kvWalkRightF5LL = new KeyValue(rtLeftLeg.angleProperty(), 0);
         KeyValue kvWalkRightF5LR = new KeyValue(rtRightLeg.angleProperty(), 0);
         KeyFrame kfWalkRightF1 = new KeyFrame(Duration.millis((playerSpeedWalk / 4) * 1), kvWalkRightF1LL, kvWalkRightF1LR);
         KeyFrame kfWalkRightF2 = new KeyFrame(Duration.millis((playerSpeedWalk / 4) * 2), kvWalkRightF2LL, kvWalkRightF2LR);
-        KeyFrame kfWalkRightF3 = new KeyFrame(Duration.millis(playerSpeedWalk), kvWalkRightF3WF);
         KeyFrame kfWalkRightF4 = new KeyFrame(Duration.millis((playerSpeedWalk / 4) * 3), kvWalkRightF4LL, kvWalkRightF4LR);
         KeyFrame kfWalkRightF5 = new KeyFrame(Duration.millis((playerSpeedWalk / 4) * 4), kvWalkRightF5LL, kvWalkRightF5LR);
         tlWalkRight.setCycleCount(1);
         tlWalkRight.setAutoReverse(false);
-        tlWalkRight.getKeyFrames().addAll(kfWalkRightF1, kfWalkRightF2, kfWalkRightF3, kfWalkRightF4, kfWalkRightF5);
-    }
-
-    public void handleWalk(String direction) {
-        if (direction.equals("left")) { // Move left
-            // Play the animation 
-            tlWalkLeft.play();
-        } else if (direction.equals("right")) { // Move Right
-            // Play the animation 
-            tlWalkRight.play();
-        }
-    }
-
-    public void handleJump() {
-        tlJump.play();
+        tlWalkRight.getKeyFrames().addAll(kfWalkRightF1, kfWalkRightF2, kfWalkRightF4, kfWalkRightF5);
     }
 
     public void changeState(String playerState) {
@@ -296,6 +303,19 @@ public class Player extends Application {
     public static void main(String[] args) {
         // Launch application
         Application.launch(args);
+    }
+    
+    private class GameTimer extends AnimationTimer {
+
+        @Override
+        public void handle(long l) {
+            // Move player
+            positionX += velocityX;
+            positionY += velocityY;
+            gBody.setTranslateX(positionX);
+            gBody.setTranslateY(positionY);
+        }
+        
     }
 
 }
