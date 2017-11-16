@@ -21,7 +21,6 @@ import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
 public class Player extends Entity {
-
     // Width and height of player
     private final double WIDTH, HEIGHT;
 
@@ -51,12 +50,16 @@ public class Player extends Entity {
     private final int playerSpeedWalk = 250;
     private final int playerAngleWalk = 25;
     private String playerState = "front"; // front, back, sideLeft, sideRight
+    AnimationTimer playerLoop = new GameTimer();
 
     // Player Movement
     private double positionX;
     private double positionY;
+    private double velocityXTemp = 0;
+    private double velocityYTemp = 0;
     private double velocityX = 0;
     private double velocityY = 0;
+    private int currentFloorNum = 1;
 
     public Player(String NAME, String LOADOUT, int xP, int xCoord, int yCoord, double WIDTH, double HEIGHT) {
         // Set x and y coords
@@ -98,8 +101,7 @@ public class Player extends Entity {
         loadout();
 
         // Player loop;
-        AnimationTimer gameLoop = new GameTimer();
-        gameLoop.start();
+        playerLoop.start();
     }
 
     public void setAnimations() {
@@ -330,6 +332,18 @@ public class Player extends Entity {
     public double getVelocityY() {
         return velocityY;
     }
+    
+    public double getVelocityXTemp() {
+        return velocityXTemp;
+    }
+
+    public double getVelocityYTemp() {
+        return velocityYTemp;
+    }
+    
+    public int getCurrentFloorNum() {
+        return currentFloorNum;
+    }
 
     public void setSpeed(int speed) {
         this.speed = speed;
@@ -366,4 +380,17 @@ public class Player extends Entity {
     public void setVelocityY(double velocityY) {
         this.velocityY = velocityY;
     }
+    
+    public void setVelocityXTemp(double velocityXTemp) {
+        this.velocityXTemp = velocityXTemp;
+    }
+    
+    public void setVelocityYTemp(double velocityYTemp) {
+        this.velocityYTemp = velocityYTemp;
+    }
+    
+    public void setCurrentFloorNum(int currentFloorNum) {
+        this.currentFloorNum = currentFloorNum;
+    }
+    
 }

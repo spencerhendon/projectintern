@@ -69,8 +69,6 @@ public class TitleScreen extends BorderPane {
         this.GAME_VERSION = version;
 
         // Setup this borderpane
-        this.setWidth(WIDTH);
-        this.setHeight(HEIGHT);
         this.setPadding(new Insets(20, 20, 20, 20));
 
         displayBackgroud(true); // Display background
